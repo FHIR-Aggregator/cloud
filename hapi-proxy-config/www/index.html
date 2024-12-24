@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title>FHIR Aggregator</title>
+        <style>
+        body{
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .message{
+            width:440px;
+            padding:20px 40px;
+            margin:0 auto;
+            background-color:#f9f9f9;
+            border:1px solid #ddd;
+            color: #1e3d62;
+        }
+        center{
+            margin:40px 0;
+        }
+        h1{
+            font-size: 18px;
+            line-height: 26px;
+        }
+        p{
+            font-size: 12px;
+        }
+        a{
+            color: rgb(207, 48, 139);
+        }
+        </style>
+    </head>
+    <body>
+        <div class="message">
+            <h1>Welcome to your <a target="_blank"  href="#"  onclick="updateLink(this)" >FHIR</a> instance</h1>
+            <p>
+            To tackle the challenge of finding and accessing biological samples across NIH consortia, this project developed a FHIR aggregator. Its goals were to provide researchers with a comprehensive index of FHIR endpoints, enable identification of relevant samples, and streamline data retrieval through APIs. Inspired by the Cancer Data Aggregator, the team extended its functionality to non-cancer resources using a unified data model. Early surveys revealed strong alignment between the Cancer Data Aggregator and FHIR, requiring minimal transformations.</p>
+            <p>
+            Since the proposal, the team advanced the project significantly. They built tools to integrate external datasets into FHIR, successfully converting genomic data and incorporating resources like Cellosaurus, a detailed cell line dictionary. These efforts facilitated the mapping of dose-response curves and experimental data, enabling researchers to include richer drug-line experiments in their analyses.</p>
+            <p>
+            Call to Action: Join us in driving this transformation—explore these tools, contribute to the integration of new datasets, and unlock the potential of FHIR-driven research.</p>
+
+            <p>For help and support, please visit: slack#ncpi-fhir-aggregator</p>
+        </div>
+    </body>    
+<script>
+function updateLink(a) {
+  //redirect 
+  window.location = 'https://hapi.' + window.location.hostname + '/fhir';
+}
+</script>
+
+</html>
