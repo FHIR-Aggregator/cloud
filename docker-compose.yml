@@ -15,7 +15,7 @@ services:
       - TZ=Etc/UTC
       - URL=$DOMAIN
       - VALIDATION=http
-      - SUBDOMAINS=docs,hapi #optional
+      - SUBDOMAINS=docs,hapi,google-fhir #optional
       # - CERTPROVIDER= #optional
       # - DNSPLUGIN=cloudflare #optional
       # - PROPAGATION= #optional
@@ -71,6 +71,15 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - hapi-fhir-postgres:/var/lib/postgresql/data
+
+  google-fhir:
+    image: google-fhir
+    container_name: google-fhir
+    ports:
+      # (HOST:CONTAINER),
+      - "8090:8080" 
+    environment:
+      - FHIR_SERVICE_URL=${FHIR_SERVICE_URL}
 
 volumes:
   hapi-fhir-postgres:
