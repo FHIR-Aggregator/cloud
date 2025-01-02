@@ -8,10 +8,10 @@ server:
 management:
   #The following configuration will enable the actuator endpoints at /actuator/health, /actuator/info, /actuator/prometheus, /actuator/metrics. For security purposes, only /actuator/health is enabled by default.
   endpoints:
-    enabled-by-default: false
+    enabled-by-default: true
     web:
       exposure:
-        include: 'health' # or e.g. 'info,health,prometheus,metrics' or '*' for all'
+        include: '*' # 'health' # or e.g. 'info,health,prometheus,metrics' or '*' for all'
   endpoint:
     info:
       enabled: true
@@ -27,6 +27,8 @@ management:
             - livenessState
             - readinessState
     prometheus:
+      enabled: true
+    threaddump:
       enabled: true
   prometheus:
     metrics:
