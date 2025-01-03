@@ -1,11 +1,15 @@
 # hapi
 HAPI FHIR server and reverse proxy
-![](docs/images/hapi-fhir-aggregator.png)
+![](docs/images/overview.png)
 ## overview
-This project contains configurations for the SWAG reverse proxy and the HAPI FHIR server
+This project contains configurations for the SWAG reverse proxy to a local instance of the [HAPI FHIR server](https://hapifhir.io/) and a proxy to the [Google Healthcare API](https://cloud.google.com/healthcare-api/docs/concepts/fhir).
+
+## prerequisites
+You have access to a GCP instance (e2-highmem-2 for example).
+
 ## usage
 
-* build the proxy to the google healthcare API
+* First, build the proxy to the google healthcare API [see](google-fhir-proxy/README.md)
 
 ```bash
 cd google-fhir-proxy
