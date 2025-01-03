@@ -2,6 +2,7 @@ import logging
 import os
 from urllib.parse import urlparse
 
+import httpx
 import requests
 from cachetools import TTLCache
 from fastapi import FastAPI, HTTPException, Request
@@ -67,17 +68,18 @@ async def proxy_get(request: Request, path: str):
     forwarded_host = request.headers.get("x-forwarded-host", None)
     forwarded_proto = request.headers.get("x-forwarded-proto", None)
 
-    try:
-        response = requests.get(target_url, headers=headers)
-        response.raise_for_status()
-        content = response.json()
-        content = adjust_urls(content, forwarded_host, forwarded_proto)
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(target_url, headers=headers)
+            response.raise_for_status()
+            content = response.json()
+            content = adjust_urls(content, forwarded_host, forwarded_proto)
 
-        return JSONResponse(content=content, status_code=response.status_code)
-    except requests.exceptions.RequestException as e:
-        raise HTTPException(
-            status_code=e.response.status_code, detail=e.response.reason
-        )
+            return JSONResponse(content=content, status_code=response.status_code)
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(
+                status_code=e.response.status_code, detail=e.response.reason
+            )
 
 
 def adjust_urls(content, forwarded_host, forwarded_proto) -> dict:

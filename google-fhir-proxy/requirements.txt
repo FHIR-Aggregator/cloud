@@ -4,3 +4,4 @@ click
 requests
 fastapi
 uvicorn
+httpx
