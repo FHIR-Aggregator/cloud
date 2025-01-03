@@ -15,14 +15,14 @@ services:
       - TZ=Etc/UTC
       - URL=$DOMAIN
       - VALIDATION=http
-      - SUBDOMAINS=docs,hapi #optional
+      - SUBDOMAINS=docs,hapi,google-fhir #optional
       # - CERTPROVIDER= #optional
       # - DNSPLUGIN=cloudflare #optional
       # - PROPAGATION= #optional
       # - EMAIL= #optional
       # - ONLY_SUBDOMAINS=false #optional
       - EXTRA_DOMAINS=$EXTRA_DOMAINS
-      # - STAGING=false#optional
+      - STAGING=${STAGING:-false} # optional
     volumes:
       - ./config:/config
     ports:
@@ -46,8 +46,8 @@ services:
       SPRING_DATASOURCE_DRIVERCLASSNAME: "org.postgresql.Driver"
       spring.jpa.properties.hibernate.dialect: "ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect"
 
-      hapi.fhir.server_address: "https://hapi.${DOMAIN}/fhir"
-      hapi.fhir.tester.home.server_address: "https://hapi.${DOMAIN}/fhir"
+      hapi.fhir.server_address: "${FHIR_BASE}"
+      hapi.fhir.tester.home.server_address: "${FHIR_BASE}"
 
 
 #      hapi.fhir.fhir_version: R5
@@ -71,6 +71,15 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - hapi-fhir-postgres:/var/lib/postgresql/data
+
+  google-fhir:
+    image: google-fhir
+    container_name: google-fhir
+    ports:
+      # (HOST:CONTAINER),
+      - "8090:8080" 
+    environment:
+      - FHIR_SERVICE_URL=${FHIR_SERVICE_URL}
 
 volumes:
   hapi-fhir-postgres:
