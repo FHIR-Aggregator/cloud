@@ -15,10 +15,12 @@ logger = logging.getLogger(__name__)
 DEFAULT_FHIR_SERVICE_URL = os.environ.get("FHIR_SERVICE_URL", None)
 DEFAULT_PORT = int(os.environ.get("PORT", 8080))
 
-assert DEFAULT_FHIR_SERVICE_URL, "DEFAULT_FHIR_SERVICE_URL not set?"
+assert DEFAULT_FHIR_SERVICE_URL, "FHIR_SERVICE_URL not set?"
 
 # Configure cache parameters
-cache = TTLCache(maxsize=10, ttl=60)  # Cache up to 10 tokens, expire after 60 seconds
+# The default expiration time for a Google access token is one hour (3,600 seconds).
+# We will cache the token for 1800 seconds to avoid unnecessary requests.
+cache = TTLCache(maxsize=10, ttl=1800)  # Cache up to 10 tokens, expire after 1800 seconds
 
 logger.info(f"DEFAULT_FHIR_SERVICE_URL: {DEFAULT_FHIR_SERVICE_URL}")
 
