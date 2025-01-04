@@ -45,7 +45,7 @@ swag          lscr.io/linuxserver/swag:latest   "/init"                  swag   
 
 ```bash
 # copy the subdirectories under the `./swag-config` directory to SWAG's `./config` directory
-cp -r swag-config/* swag/config/
+cp -r swag-config/* config/
 # (for HAPI) add passwords to config/nginx/.htpasswd
 # e.g. htpasswd config/nginx/.htpasswd user password
  
