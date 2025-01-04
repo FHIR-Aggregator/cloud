@@ -1,8 +1,17 @@
-# hapi
-HAPI FHIR server and reverse proxy
-![](docs/images/overview.png)
+# cloud
+
 ## overview
 This project contains configurations for the SWAG reverse proxy to a local instance of the [HAPI FHIR server](https://hapifhir.io/) and a proxy to the [Google Healthcare API](https://cloud.google.com/healthcare-api/docs/concepts/fhir).
+
+* SSL termination
+* Reverse proxy
+* HAPI FHIR server
+* Google Healthcare API
+* Static html pages
+
+ 
+![](docs/images/overview.png)
+
 
 ## prerequisites
 You have access to a GCP instance (e2-highmem-2 for example).
@@ -54,3 +63,5 @@ curl -s https://hapi.test-fhir-aggregator.org/fhir/'Patient?_total=accurate&_cou
 curl -s https://google-fhir.test-fhir-aggregator.org/'Patient?_total=accurate&_count=0' | jq .total
 
 ```
+
+* static content is served from the `./swag-config/www` directory
