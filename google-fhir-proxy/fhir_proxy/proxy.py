@@ -77,7 +77,7 @@ async def proxy_get(request: Request, path: str):
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(target_url, headers=headers)
+            response = await client.get(target_url, headers=headers, timeout=300)
             response.raise_for_status()
             content = response.json()
             content = adjust_urls(content, forwarded_host, forwarded_proto)
