@@ -33,4 +33,4 @@ COPY . .
 EXPOSE 8080
 
 # Command to run the application using Uvicorn
-CMD ["uvicorn", "proxy:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "fhir_proxy.proxy:app", "--host", "0.0.0.0", "--port", "8080"]
