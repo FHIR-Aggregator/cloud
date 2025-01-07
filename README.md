@@ -54,7 +54,8 @@ docker compose restart swag
 
 ```
 
-* load data into the hapi fhir server &/or the google healthcare api (documented elsewhere)
+* load data into the [hapi](https://github.com/FHIR-Aggregator/hapi?tab=readme-ov-file#load-the-data) fhir server &/or the [google healthcare api](https://github.com/FHIR-Aggregator/healthcare-api/blob/development/README.md#import-data)
+
 * query the servers
 
 ```bash
