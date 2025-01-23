@@ -5,6 +5,8 @@ server:
   port: 8080
 #Adds the option to go to eg. http://localhost:8080/actuator/health for seeing the running configuration
 #see https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints
+  tomcat:
+    relaxed-query-chars: "|" # This is needed to allow | in URLs
 management:
   #The following configuration will enable the actuator endpoints at /actuator/health, /actuator/info, /actuator/prometheus, /actuator/metrics. For security purposes, only /actuator/health is enabled by default.
   endpoints:

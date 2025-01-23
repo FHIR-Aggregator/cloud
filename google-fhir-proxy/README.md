@@ -17,6 +17,10 @@
 * The proxy acts as a [message translator](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageTranslator.html).  Since FHIR BundleResponse is a hypermedia type, the proxy translates the links '.link[] | .url' and '.entry[] | .fullUrl' urls to point to the proxied host (forwarded_proto, forwarded_host).
 * This might be possible to implement with the nginx proxy, but it was easier to implement in python.
 
+## Testing
+```bash
+FHIR_SERVICE_URL=http://example.com/fhir pytest
+```
 ## Build image
 docker build --cache-from=google-fhir:latest   . -t google-fhir
 

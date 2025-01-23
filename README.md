@@ -1,8 +1,17 @@
-# hapi
-HAPI FHIR server and reverse proxy
-![](docs/images/overview.png)
+# cloud
+
 ## overview
 This project contains configurations for the SWAG reverse proxy to a local instance of the [HAPI FHIR server](https://hapifhir.io/) and a proxy to the [Google Healthcare API](https://cloud.google.com/healthcare-api/docs/concepts/fhir).
+
+* SSL termination
+* Reverse proxy
+* HAPI FHIR server
+* Google Healthcare API
+* Static html pages
+
+ 
+![](docs/images/overview.png)
+
 
 ## prerequisites
 You have access to a GCP instance (e2-highmem-2 for example).
@@ -36,7 +45,7 @@ swag          lscr.io/linuxserver/swag:latest   "/init"                  swag   
 
 ```bash
 # copy the subdirectories under the `./swag-config` directory to SWAG's `./config` directory
-cp -r swag-config/* swag/config/
+cp -r swag-config/* config/
 # (for HAPI) add passwords to config/nginx/.htpasswd
 # e.g. htpasswd config/nginx/.htpasswd user password
  
@@ -45,7 +54,8 @@ docker compose restart swag
 
 ```
 
-* load data into the hapi fhir server &/or the google healthcare api (documented elsewhere)
+* load data into the [hapi](https://github.com/FHIR-Aggregator/hapi?tab=readme-ov-file#load-the-data) fhir server &/or the [google healthcare api](https://github.com/FHIR-Aggregator/healthcare-api/blob/development/README.md#import-data)
+
 * query the servers
 
 ```bash
@@ -54,3 +64,5 @@ curl -s https://hapi.test-fhir-aggregator.org/fhir/'Patient?_total=accurate&_cou
 curl -s https://google-fhir.test-fhir-aggregator.org/'Patient?_total=accurate&_count=0' | jq .total
 
 ```
+
+* static content is served from the `./swag-config/www` directory
