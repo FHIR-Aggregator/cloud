@@ -13,8 +13,11 @@ This project contains configurations for the SWAG reverse proxy to a local insta
 ![](docs/images/overview.png)
 
 
-## prerequisites
+## Prerequisites
 You have access to a GCP instance (e2-highmem-2 for example).
+
+## The Google Healthcare API is enabled and the FHIR store is created
+See [Google-setup.md](Google-setup.md) for details.
 
 ## usage
 
