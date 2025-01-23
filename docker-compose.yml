@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
 
   hapi:
-    image: hapiproject/hapi:v7.4.0
+    image: hapiproject/hapi:v7.6.0
     container_name: hapi
     restart: on-failure
     volumes:
