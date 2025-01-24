@@ -94,3 +94,67 @@ spec:
       port: 80
       targetPort: 8080
 EOF
+
+# Create the ServiceAccount for google-fhir-proxy
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: google-fhir-proxy-sa
+  namespace: $NAMESPACE
+EOF
+
+# Create the Role for google-fhir-proxy
+cat <<EOF | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: $NAMESPACE
+  name: google-fhir-proxy-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch"]
+EOF
+
+# Create the RoleBinding for google-fhir-proxy
+cat <<EOF | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: google-fhir-proxy-rolebinding
+  namespace: $NAMESPACE
+subjects:
+- kind: ServiceAccount
+  name: google-fhir-proxy-sa
+  namespace: $NAMESPACE
+roleRef:
+  kind: Role
+  name: google-fhir-proxy-role
+  apiGroup: rbac.authorization.k8s.io
+EOF
+
+# Create the Deployment for google-fhir-proxy
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: google-fhir-proxy
+  namespace: $NAMESPACE
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: google-fhir-proxy
+  template:
+    metadata:
+      labels:
+        app: google-fhir-proxy
+    spec:
+      serviceAccountName: google-fhir-proxy-sa
+      containers:
+      - name: google-fhir-proxy
+        image: your-google-fhir-proxy-image
+        ports:
+        - containerPort: 8080
+EOF
