@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# Load environment variables from .env-k8s-sample
-source .env-k8s-sample
+# https://bertvv.github.io/cheat-sheets/Bash.html#writing-robust-scripts-and-debugging
+set -euo pipefail
+
 
 # Check if required environment variables are set
+# See .env-k8s-sample
 : "${PROJECT_ID:?Need to set PROJECT_ID}"
 : "${CLUSTER_NAME:?Need to set CLUSTER_NAME}"
 : "${ZONE:?Need to set ZONE}"

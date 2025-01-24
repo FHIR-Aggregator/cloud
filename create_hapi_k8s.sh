@@ -1,11 +1,17 @@
 #!/bin/bash
 
+# https://bertvv.github.io/cheat-sheets/Bash.html#writing-robust-scripts-and-debugging
+set -euo pipefail
+
+# Check if required environment variables are set
+# See .env-k8s-sample
+
 # --- Configuration ---
 # see .env-k8s-sample file
-#PROJECT_ID="ncpi-rti-p01-007-ohsu"
-#REGION="us-central1" # Choose your preferred region
-#CLUSTER_NAME="my-hapi-fhir-cluster"
-#NUM_NODES=3 # Adjust as needed
+: "${PROJECT_ID:?Need to set PROJECT_ID}"
+: "${REGION:?Need to set REGION}"
+: "${CLUSTER_NAME:?Need to set CLUSTER_NAME}"
+: "${NUM_NODES:?Need to set NUM_NODES}"
 
 
 # --- Create GKE Cluster ---
