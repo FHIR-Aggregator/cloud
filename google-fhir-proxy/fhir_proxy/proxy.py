@@ -6,7 +6,8 @@ import httpx
 import requests
 from cachetools import TTLCache
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, ORJSONResponse
+import orjson
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -47,7 +48,7 @@ def fetch_token():
 
 
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
+async def add_service_account_header(request: Request, call_next):
     token = cache.get("access_token")
     if not token:
         token = fetch_token()
@@ -79,10 +80,10 @@ async def proxy_get(request: Request, path: str):
         try:
             response = await client.get(target_url, headers=headers, timeout=300)
             response.raise_for_status()
-            content = response.json()
+            content = orjson.loads(response.text)
             content = adjust_urls(content, forwarded_host, forwarded_proto)
 
-            return JSONResponse(content=content, status_code=response.status_code)
+            return ORJSONResponse(content=content, status_code=response.status_code)
         except httpx.HTTPStatusError as e:
 
             raise HTTPException(
