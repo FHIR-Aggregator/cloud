@@ -120,7 +120,7 @@ def extract_extension_values(resource: dict[str, Any], extension_dict: dict[str,
         v = next(iter([ext[k] for k in ext.keys() if k.startswith("value")]), None)
         if isinstance(v, dict):
             v = '|'.join([str(_) for _ in v.values()])
-        extension_dict[str(v)] += 1
+        extension_dict[ext['url'] + '|' + str(v)] += 1
 
     return extension_dict
 
@@ -144,8 +144,9 @@ def render_as_fhir_parameters(count_dict: dict[str, int]) -> dict[str, Any]:
     }
 
 
+#@app.get("/{fhir_store_id}/{resource_type}/$vocabulary")
 @app.get("/{resource_type}/$vocabulary")
-async def get_vocabulary(request: Request, resource_type: str):
+async def get_vocabulary(request: Request,  resource_type: str):
     """Return a vocabulary for the specified resource type.
 
     Extracts display values from code.coding.display and category.coding.display.
@@ -156,8 +157,9 @@ async def get_vocabulary(request: Request, resource_type: str):
 
     parsed_url = urlparse(request.url._url)  # noqa: disable=protected-access
     request_query = parsed_url.query
-    request_query = request_query + f"{'&' if request_query else '?'}_elements=extension,category,code,type"
+    request_query = request_query + f"{'&' if request_query else '?'}_elements=extension,category,code,type&_count=1000"
     target_url = f"{DEFAULT_FHIR_SERVICE_URL}/{resource_type}{request_query}"
+    headers = {"Authorization": f"Bearer {request.state.token}"}
 
     if vocabulary_cache.get(target_url):
         return ORJSONResponse(content=vocabulary_cache.get(target_url))
@@ -169,7 +171,7 @@ async def get_vocabulary(request: Request, resource_type: str):
         category_dict = defaultdict(int)
         extension_dict = defaultdict(int)
         while url:
-            response = await client.get(url)
+            response = await client.get(url, headers=headers, timeout=300)
             response.raise_for_status()
             page_count += 1
             data = orjson.loads(response.text)
@@ -204,6 +206,8 @@ async def proxy_get(request: Request, path: str):
     logger.debug(f"request.headers: {request.headers}")
     forwarded_host = request.headers.get("x-forwarded-host", None)
     forwarded_proto = request.headers.get("x-forwarded-proto", None)
+
+    assert "$vocabulary" not in request_path, request_path
 
     async with httpx.AsyncClient() as client:
         try:
