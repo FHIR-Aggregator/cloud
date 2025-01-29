@@ -27,9 +27,7 @@ token_cache = TTLCache(
 )  # Cache up to 10 tokens, expire after 1800 seconds
 
 # We will cache the vocabularies for infinite time, as they are not expected to change frequently.
-vocabulary_cache = Cache(
-    maxsize=100
-)  # Cache up to 100 tokens, dont expire
+vocabulary_cache = Cache(maxsize=100)  # Cache up to 100 tokens, dont expire
 
 
 if not DEFAULT_FHIR_SERVICE_URL:
@@ -72,7 +70,11 @@ async def add_service_account_header(request: Request, call_next):
     return response
 
 
-def extract_display_values(resource: dict[str, Any], code_dict: dict[str, int] = defaultdict(int), category_dict: dict[str, int] = defaultdict(int)) -> (dict[str, int], dict[str, int]):
+def extract_display_values(
+    resource: dict[str, Any],
+    code_dict: dict[str, int] = defaultdict(int),
+    category_dict: dict[str, int] = defaultdict(int),
+) -> (dict[str, int], dict[str, int]):
     """
     Extracts display values from `code.coding` and `category.coding`
     and maintains a count dictionary.
@@ -104,7 +106,9 @@ def extract_display_values(resource: dict[str, Any], code_dict: dict[str, int] =
     return code_dict, category_dict
 
 
-def extract_extension_values(resource: dict[str, Any], extension_dict: dict[str, int] = defaultdict(int)) -> dict[str, int]:
+def extract_extension_values(
+    resource: dict[str, Any], extension_dict: dict[str, int] = defaultdict(int)
+) -> dict[str, int]:
     """
     Extracts values from `extension.value[x]` fields and maintains a count dictionary.
 
@@ -119,8 +123,8 @@ def extract_extension_values(resource: dict[str, Any], extension_dict: dict[str,
     for ext in resource.get("extension", []):
         v = next(iter([ext[k] for k in ext.keys() if k.startswith("value")]), None)
         if isinstance(v, dict):
-            v = '|'.join([str(_) for _ in v.values()])
-        extension_dict[ext['url'] + '|' + str(v)] += 1
+            v = "|".join([str(_) for _ in v.values()])
+        extension_dict[ext["url"] + "|" + str(v)] += 1
 
     return extension_dict
 
@@ -138,15 +142,14 @@ def render_as_fhir_parameters(count_dict: dict[str, int]) -> dict[str, Any]:
     return {
         "resourceType": "Parameters",
         "parameter": [
-            {"name": key, "valueInteger": value}
-            for key, value in count_dict.items()
-        ]
+            {"name": key, "valueInteger": value} for key, value in count_dict.items()
+        ],
     }
 
 
-#@app.get("/{fhir_store_id}/{resource_type}/$vocabulary")
+# @app.get("/{fhir_store_id}/{resource_type}/$vocabulary")
 @app.get("/{resource_type}/$vocabulary")
-async def get_vocabulary(request: Request,  resource_type: str):
+async def get_vocabulary(request: Request, resource_type: str):
     """Return a vocabulary for the specified resource type.
 
     Extracts display values from code.coding.display and category.coding.display.
@@ -157,7 +160,10 @@ async def get_vocabulary(request: Request,  resource_type: str):
 
     parsed_url = urlparse(request.url._url)  # noqa: disable=protected-access
     request_query = parsed_url.query
-    request_query = request_query + f"{'&' if request_query else '?'}_elements=extension,category,code,type&_count=1000"
+    request_query = (
+        request_query
+        + f"{'&' if request_query else '?'}_elements=extension,category,code,type&_count=1000"
+    )
     target_url = f"{DEFAULT_FHIR_SERVICE_URL}/{resource_type}{request_query}"
     headers = {"Authorization": f"Bearer {request.state.token}"}
 
@@ -177,17 +183,32 @@ async def get_vocabulary(request: Request,  resource_type: str):
             data = orjson.loads(response.text)
             for entry in data.get("entry", []):
                 resource = entry["resource"]
-                code_dict, category_dict = extract_display_values(resource, code_dict, category_dict)
+                code_dict, category_dict = extract_display_values(
+                    resource, code_dict, category_dict
+                )
                 extension_dict = extract_extension_values(resource, extension_dict)
 
-            next_link = next((link["url"] for link in data.get("link", []) if link["relation"] == "next"), None)
+            next_link = next(
+                (
+                    link["url"]
+                    for link in data.get("link", [])
+                    if link["relation"] == "next"
+                ),
+                None,
+            )
 
             url = next_link
 
     parameters = {"resourceType": "Parameters", "parameter": []}
-    parameters["parameter"].append({"name": "code", "resource": render_as_fhir_parameters(code_dict)})
-    parameters["parameter"].append({"name": "category", "resource": render_as_fhir_parameters(category_dict)})
-    parameters["parameter"].append({"name": "extension", "resource": render_as_fhir_parameters(extension_dict)})
+    parameters["parameter"].append(
+        {"name": "code", "resource": render_as_fhir_parameters(code_dict)}
+    )
+    parameters["parameter"].append(
+        {"name": "category", "resource": render_as_fhir_parameters(category_dict)}
+    )
+    parameters["parameter"].append(
+        {"name": "extension", "resource": render_as_fhir_parameters(extension_dict)}
+    )
 
     vocabulary_cache[target_url] = parameters
 
