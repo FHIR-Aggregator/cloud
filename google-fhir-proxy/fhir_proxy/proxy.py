@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 import httpx
 import orjson
@@ -74,8 +74,9 @@ async def proxy_get(request: Request, path: str):
     parsed_url = urlparse(request.url._url)  # noqa: disable=protected-access
     request_path = parsed_url.path
     request_query = parsed_url.query
+    request_query_dict = parse_qs(request_query)
 
-    target_url = f"{DEFAULT_FHIR_SERVICE_URL}{request_path}?{request_query}"
+    target_url = f"{DEFAULT_FHIR_SERVICE_URL}{request_path}"
     headers = {"Authorization": f"Bearer {request.state.token}"}
     forwarded_host = request.headers.get("x-forwarded-host", None)
     forwarded_proto = request.headers.get("x-forwarded-proto", None)
@@ -84,14 +85,14 @@ async def proxy_get(request: Request, path: str):
         try:
 
             start_time = time.time()
-            response = await client.get(target_url, headers=headers, timeout=300)
+            response = await client.get(target_url, params=request_query_dict, headers=headers, timeout=300)
             response.raise_for_status()
             content = orjson.loads(response.text)
             content = adjust_urls(content, forwarded_host, forwarded_proto)
             end_time = time.time()
 
             response_time = end_time - start_time
-            logger.info(f"Response time: {response_time:.2f} seconds {target_url}")
+            logger.info(f"Response time: {response_time:.2f} seconds {response.url} total {content.get('total', 'unknown')}")
 
             return ORJSONResponse(content=content, status_code=response.status_code)
         except httpx.HTTPStatusError as e:
