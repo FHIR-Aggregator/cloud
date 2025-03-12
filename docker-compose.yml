@@ -81,5 +81,10 @@ services:
     environment:
       - FHIR_SERVICE_URL=${FHIR_SERVICE_URL}
 
+  website:
+    # TODO Add Website's static build configuration here
+    environment:
+      - FOO=BAR
+
 volumes:
   hapi-fhir-postgres:
