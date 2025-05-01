@@ -15,7 +15,7 @@ services:
       - TZ=Etc/UTC
       - URL=$DOMAIN
       - VALIDATION=http
-      - SUBDOMAINS=docs,hapi,google-fhir #optional
+      - SUBDOMAINS=docs,google-fhir #optional
       # - CERTPROVIDER= #optional
       # - DNSPLUGIN=cloudflare #optional
       # - PROPAGATION= #optional
@@ -30,48 +30,6 @@ services:
       - 80:80 #optional
     restart: unless-stopped
 
-#  hapi:
-#    image: hapiproject/hapi:v7.6.0
-#    container_name: hapi
-#    restart: on-failure
-#    volumes:
-#      - ./application.yaml:/configs/application.yaml
-#    environment:
-#      # specify our mounted config file
-#      SPRING_CONFIG_LOCATION: "file:///configs/application.yaml"
-#      # overwrite config values
-#      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/hapi"
-#      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-#      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-#      SPRING_DATASOURCE_DRIVERCLASSNAME: "org.postgresql.Driver"
-#      spring.jpa.properties.hibernate.dialect: "ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect"
-#
-#      hapi.fhir.server_address: "${FHIR_BASE}"
-#      hapi.fhir.tester.home.server_address: "${FHIR_BASE}"
-#
-#
-##      hapi.fhir.fhir_version: R5
-##      hapi.fhir.enforce_referential_integrity_on_write: false
-##      hapi.fhir.bulk_export_enabled: true
-##      hapi.fhir.bulk_import_enabled: true
-##      hapi.fhir.tester.home.fhir_version: R5
-##      hapi.fhir.delete_expunge_enabled: true
-##      hapi.fhir.expunge_enabled: true
-#      hapi.hfql.endpoint.enabled: true
-#    ports:
-#      - "8080:8080"
-
-#  postgres:
-#    image: postgres:15-alpine
-#    container_name: postgres
-#    restart: always
-#    environment:
-#      POSTGRES_DB: "hapi"
-#      POSTGRES_USER: ${DB_USERNAME}
-#      POSTGRES_PASSWORD: ${DB_PASSWORD}
-#    volumes:
-#      - hapi-fhir-postgres:/var/lib/postgresql/data
-
   google-fhir:
     image: google-fhir
     container_name: google-fhir
@@ -80,6 +38,3 @@ services:
       - "8090:8080" 
     environment:
       - FHIR_SERVICE_URL=${FHIR_SERVICE_URL}
-
-volumes:
-  hapi-fhir-postgres:
