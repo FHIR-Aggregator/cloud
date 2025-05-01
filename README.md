@@ -5,7 +5,6 @@ This project contains configurations for the SWAG reverse proxy to a local insta
 
 * SSL termination
 * Reverse proxy
-* HAPI FHIR server
 * Google Healthcare API
 * Static html pages
 
@@ -14,7 +13,8 @@ This project contains configurations for the SWAG reverse proxy to a local insta
 
 
 ## Prerequisites
-You have access to a GCP instance (e2-highmem-2 for example).
+You have access to a GCP instance (minimum e2-small).
+See vm-setup.md for details.
 
 ## The Google Healthcare API is enabled and the FHIR store is created
 See [Google-setup.md](Google-setup.md) for details.
@@ -52,13 +52,12 @@ docker compose restart swag
 
 ```
 
-* Load data into the [hapi](https://github.com/FHIR-Aggregator/hapi?tab=readme-ov-file#load-the-data) fhir server &/or the [google healthcare api](https://github.com/FHIR-Aggregator/healthcare-api/blob/development/README.md#import-data)
+* Load data into the [google healthcare api](https://github.com/FHIR-Aggregator/healthcare-api/blob/development/README.md#import-data)
 
-* query the servers
+* query the server
 
 ```bash
 # 
-curl -s https://hapi.test-fhir-aggregator.org/fhir/'Patient?_total=accurate&_count=0'  | jq .total
 curl -s https://google-fhir.test-fhir-aggregator.org/'Patient?_total=accurate&_count=0' | jq .total
 
 ```
