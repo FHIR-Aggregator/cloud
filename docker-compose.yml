@@ -80,6 +80,7 @@ services:
       - "8090:8080" 
     environment:
       - FHIR_SERVICE_URL=${FHIR_SERVICE_URL}
+    restart: unless-stopped
 
 volumes:
   hapi-fhir-postgres:
