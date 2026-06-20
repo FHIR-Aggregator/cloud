@@ -78,8 +78,7 @@ async def proxy_get(request: Request, path: str):
 
     target_url = f"{DEFAULT_FHIR_SERVICE_URL}{request_path}"
     headers = {"Authorization": f"Bearer {request.state.token}"}
-    forwarded_host = request.headers.get("x-forwarded-host", None)
-    forwarded_proto = request.headers.get("x-forwarded-proto", None)
+    forwarded_host, forwarded_proto = _public_host_proto(request)
 
     async with httpx.AsyncClient() as client:
         try:
@@ -100,6 +99,36 @@ async def proxy_get(request: Request, path: str):
             raise HTTPException(
                 status_code=e.response.status_code, detail=e.response.reason_phrase
             )
+
+
+def _public_host_proto(request: Request):
+    """Resolve the public-facing host/proto used to rewrite response links.
+
+    The backend FHIR store returns pagination (`next`) and `fullUrl` links that
+    contain the backend's own address (e.g. healthcare.googleapis.com/...). If
+    those are not rewritten to the proxy's public address, clients follow them
+    straight to the backend and get a 401 -- the proxy holds the service-account
+    credentials, the client does not. This was the cause of the cholangiocarcinoma
+    example stopping at page 1 (100/389 resources).
+
+    We must therefore ALWAYS resolve a non-None host, even when the upstream
+    reverse proxy fails to send X-Forwarded-* headers. Resolution order:
+      1. X-Forwarded-Host / X-Forwarded-Proto (set by the front reverse proxy)
+      2. PUBLIC_BASE_URL env var (explicit deployment override)
+      3. the request's own Host header / scheme (last-resort, never leak backend)
+    """
+    host = request.headers.get("x-forwarded-host")
+    proto = request.headers.get("x-forwarded-proto")
+
+    public_base = os.environ.get("PUBLIC_BASE_URL")
+    if public_base:
+        parsed = urlparse(public_base)
+        host = host or parsed.netloc
+        proto = proto or parsed.scheme
+
+    host = host or request.headers.get("host")
+    proto = proto or request.url.scheme
+    return host, proto
 
 
 def adjust_urls(content, forwarded_host, forwarded_proto) -> dict:
